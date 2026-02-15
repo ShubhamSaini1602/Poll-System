@@ -22,7 +22,7 @@ const io = new Server(server, {
 // Configure CORS for HTTP Connections
 // We must apply the cors middleware before any middleware runs
 app.use(cors({
-    origin: ["http://localhost:5173", "https://poll-system.netlify.app"],
+    origin: ["http://localhost:5173", "https://poll-web.netlify.app"],
     credentials: true
 }));
 app.use(express.json());
