@@ -1,0 +1,266 @@
+:root {
+  	--primary: #6366f1;
+  	--primary-dark: #4f46e5;
+  	--danger: #ef4444;  
+  	--bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  	--glass-bg: rgba(255, 255, 255, 0.90);
+  	--glass-border: 1px solid rgba(255, 255, 255, 0.5);
+  	--shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  	--text-main: #1e293b;
+  	--text-muted: #64748b;
+  	--radius: 20px;
+}
+
+* {
+  	box-sizing: border-box;
+  	margin: 0;
+  	padding: 0;
+}
+
+body {
+  	font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  	background: var(--bg-gradient);
+  	min-height: 100vh;
+  	color: var(--text-main);
+  	display: flex;
+  	justify-content: center;
+  	align-items: center;
+  	padding: 20px;
+}
+
+.container {
+  	width: 100%;
+  	max-width: 550px;
+}
+
+.card {
+  	background: var(--glass-bg);
+  	backdrop-filter: blur(12px);
+  	-webkit-backdrop-filter: blur(12px);
+  	border: var(--glass-border);
+  	border-radius: var(--radius);
+  	box-shadow: var(--shadow);
+  	padding: 2.5rem;
+  	width: 100%;
+  	position: relative;
+  	overflow: hidden;
+  	transition: transform 0.3s ease;
+}
+
+h1 {
+  	font-size: 1.8rem;
+  	font-weight: 800;
+  	margin-bottom: 0.5rem;
+  	color: var(--text-main);
+  	letter-spacing: -0.5px;
+  	text-align: center;
+}
+
+.subtitle {
+  	text-align: center;
+  	color: var(--text-muted);
+  	font-size: 1.3rem;
+  	margin-bottom: 2rem;
+  	line-height: 1.5;
+	font-family: "Figtree", sans-serif;
+}
+
+/* --- Form Styles --- */
+.input-group {
+  	margin-bottom: 1.2rem;
+  	position: relative;
+}
+
+label {
+  	display: block;
+  	font-size: 0.9rem;
+  	font-weight: bolder;
+  	margin-bottom: 0.5rem;
+  	color: var(--text-main);
+	font-family: "Figtree", sans-serif;
+}
+
+input[type="text"] {
+  	width: 100%;
+  	padding: 14px 16px;
+  	border: 2px solid #e2e8f0;
+  	border-radius: 12px;
+  	font-size: 1rem;
+  	background: #f8fafc;
+  	color: var(--text-main);
+  	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input[type="text"]:focus {
+  	outline: none;
+  	border-color: var(--primary);
+  	background: #fff;
+  	box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.error-border {
+  	border-color: var(--danger) !important;
+  	background: #fef2f2 !important;
+}
+
+.error-border:focus {
+  	box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+}
+
+.error-text {
+  	color: var(--danger);
+  	font-size: 0.85rem;
+  	margin-top: 0.4rem;
+  	font-weight: 500;
+  	display: flex;
+  	align-items: center;
+  	gap: 4px;
+}
+
+/* --- Buttons --- */
+.btn {
+  	width: 100%;
+  	padding: 16px;
+  	border: none;
+  	border-radius: 12px;
+  	font-size: 1rem;
+  	font-weight: 600;
+  	cursor: pointer;
+  	transition: all 0.2s ease;
+  	display: flex;
+  	justify-content: center;
+  	align-items: center;
+  	gap: 8px;
+	font-family: "Figtree", sans-serif;
+}
+
+.btn-primary {
+  	background: var(--primary);
+  	color: white;
+  	margin-top: 1.5rem;
+  	box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+	font-family: "Figtree", sans-serif;
+}
+
+.btn-primary:hover {
+  	background: var(--primary-dark);
+  	transform: translateY(-2px);
+  	box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary:active {
+  	transform: translateY(0);
+}
+
+.btn-ghost {
+  	background: transparent;
+  	color: var(--primary);
+  	border: 1px dashed #cbd5e1;
+  	margin-top: 0.5rem;
+}
+
+.btn-ghost:hover {
+  	background: #eff6ff;
+  	border-color: var(--primary);
+}
+
+.icon-btn {
+  	background: white;
+  	border: 1px solid #e2e8f0;
+  	color: var(--danger);
+  	width: 44px;
+  	height: 44px;
+  	border-radius: 10px;
+  	cursor: pointer;
+  	display: flex;
+  	align-items: center;
+  	justify-content: center;
+  	transition: all 0.2s;
+  	flex-shrink: 0; 
+}
+
+.icon-btn:hover {
+  	background: #fef2f2;
+  	border-color: var(--danger);
+  	transform: scale(1.05);
+}
+
+/* --- Poll Results UI --- */
+.options-list {
+  	display: flex;
+  	flex-direction: column;
+  	gap: 12px;
+}
+
+.poll-option {
+  	position: relative;
+  	background: white;
+  	border: 1px solid #e2e8f0;
+  	border-radius: 14px;
+  	padding: 16px;
+  	cursor: pointer;
+  	overflow: hidden;
+  	transition: border-color 0.2s, transform 0.2s;
+}
+
+.poll-option:hover {
+  	border-color: var(--primary);
+  	transform: translateX(4px);
+}
+
+.poll-option.disabled {
+  	cursor: default;
+  	transform: none;
+  	border-color: transparent;
+  	background: #f8fafc;
+}
+
+.progress-bar {
+  	position: absolute;
+  	top: 0;
+  	left: 0;
+  	height: 100%;
+  	background: rgba(99, 102, 241, 0.12);
+  	z-index: 1;
+}
+
+.option-content {
+  	position: relative;
+  	z-index: 2;
+  	display: flex;
+  	justify-content: space-between;
+  	align-items: center;
+  	font-weight: 500;
+  	color: var(--text-main);
+}
+
+/* Percentage Text */
+.option-content span:last-child {
+  	font-family: 'Monaco', 'Courier New', monospace;
+  	font-weight: 700;
+  	font-size: 0.9rem;
+}
+
+/* --- Loading Spinner --- */
+.loading-spinner {
+  	font-size: 1.5rem;
+  	font-weight: 600;
+  	color: var(--primary);
+  	display: flex;
+  	justify-content: center;
+  	align-items: center;
+  	height: 50vh;
+  	animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  	0% { 
+		opacity: 0.6; 
+	}
+  	50% { 
+		opacity: 1; 
+	}
+  	100% { 
+		opacity: 0.6; 
+	}
+}

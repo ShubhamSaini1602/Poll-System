@@ -1,0 +1,17 @@
+const redis = require("redis");
+
+const redisClient = redis.createClient({
+    username: 'default',
+    password: process.env.REDIS_KEY,
+    socket: {
+        host: process.env.REDIS_HOST,
+        port: 16471
+    }
+});
+
+// Redis Error Listener
+redisClient.on('error', (err) => {
+    console.log('Redis Client Error', err);
+});
+
+module.exports = redisClient;
