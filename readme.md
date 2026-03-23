@@ -1,78 +1,167 @@
-🏗️ Architecture & Tech Stack
+#  PollSync — Real-Time Polling Like WhatsApp
 
-➡️ FRONTEND: React (Vite), Redux Toolkit, Framer Motion, CSS.
-➡️ BACKEND: Node.js, Express.js.
-➡️ REAL TIME - ENGINE: Socket.io (WebSockets) for bi-directional event-based 
-   communication.
-➡️ DATABASE: MongoDB (Atlas) for persistent storage and REDIS for rate-limiting.
-➡️ STATE MANAGEMENT: Redux (Global State) + React Hook Form (Uncontrolled Inputs).
+## 🏗️ Architecture & Tech Stack
 
-🛡️ Fairness & Anti-Abuse Mechanisms (The "Two-Layer Defense")
+### Frontend
+- React (Vite)  
+- Redux Toolkit  
+- Framer Motion  
+- CSS  
 
-To satisfy the requirement of "fairness" without forcing users to create an account (which lowers conversion), I implemented a tiered security approach:
+### Backend
+- Node.js  
+- Express.js  
 
-🟢 Client-Side "Soft" Lock (UX Focused) -> Mechanism: LocalStorage Persistence.
+### Real-Time Engine
+- Socket.io (WebSockets) for bi-directional event-based communication  
 
-👉 Implementation: When a user votes, a unique key (poll_voted_{id}) is stored in the browser's local storage. On page load, the application checks for this key and instantly disables the voting UI.
+### Database
+- MongoDB (Atlas) for persistent storage  
+- Redis for rate-limiting  
 
-Purpose: Prevents accidental and intentional double-submissions and provides immediate visual feedback to the user, improving the User Experience (UX).
+### State Management
+- Redux (Global State)  
+- React Hook Form (Uncontrolled Inputs)  
 
-🟢 Server-Side IP Verification (Security Focused) -> Mechanism: IP Address Tracking & Normalization.
+---
 
-👉 Implementation:
+## 🛡️ Fairness & Anti-Abuse Mechanisms (Two-Layer Defense)
 
-The backend extracts the real IP address from the socket handshake (socket.handshake.address or x-forwarded-for).
+To ensure fairness without forcing user authentication (which reduces conversion), a **tiered security approach** is implemented:
 
-IPv6 Normalization: Handles dual-stack network issues by normalizing local IPv6 addresses (::1) to IPv4 (127.0.0.1) to prevent spoofing.
+---
 
-Atomic Check: Before recording a vote, the server queries the votedIps array in the MongoDB document. If the IP exists, the request is rejected immediately.
+### 🟢 Client-Side "Soft" Lock (UX Focused)
 
-Purpose: Prevents users from bypassing the client-side lock by using "Incognito Mode", clearing their cache, or using different browsers on the same machine.
+**Mechanism:** LocalStorage Persistence  
 
-⚡ Edge Cases Handled
+**Implementation:**
+- When a user votes, a unique key (`poll_voted_{id}`) is stored in browser localStorage  
+- On page load, the app checks this key and disables the voting UI  
 
-➜ Race Conditions (Concurrency)
-The Risk: If 100 users vote for "Option A" at the exact same millisecond, a standard read-modify-write operation would result in data loss (only 1 vote counted instead of 100).
+**Purpose:**
+- Prevents accidental or repeated submissions  
+- Provides instant feedback to the user  
+- Enhances overall user experience  
 
-▶️ The Solution: Implemented MongoDB Atomic Operators ($inc, $push). The database handles the locking and incrementing internally, ensuring 100% data integrity even under heavy load.
+---
 
-➜ Network Normalization (The "Localhost Trap")
-The Risk: A user could vote once via IPv4 (127.0.0.1) and again via IPv6 (::1), bypassing the IP check.
+### 🟢 Server-Side IP Verification (Security Focused)
 
-▶️ The Solution: Implemented a normalization utility in the socket handler to treat both addresses as a single identity.
+**Mechanism:** IP Address Tracking & Normalization  
 
-➜ Basic Double Voting:
-The Risk: A user clicks "Vote" twice rapidly.
+**Implementation:**
+- Extracts real IP from:
+  - `socket.handshake.address`  
+  - `x-forwarded-for` header  
+- Handles IPv6 normalization:
+  - `::1` → `127.0.0.1`  
+- Performs atomic check in MongoDB:
+  - If IP exists in `votedIps`, request is rejected  
 
-▶️ The Solution: Our frontend "Optimistic UI" disables the button immediately, and your backend checks the IP before writing to the DB.
+**Purpose:**
+- Prevents bypass via:
+  - Incognito mode  
+  - Cache clearing  
+  - Multiple browsers  
 
-➜ Incognito Mode / Cache Clearing:
-The Risk: A user clears their browser cache to bypass LocalStorage.
+---
 
-▶️ The Solution: Our backend IP check catches them.
+## ⚡ Edge Cases Handled
 
-➜ Server Crashes:
-The Risk: The server restarts mid-vote.
+### ➜ Race Conditions (Concurrency)
 
-▶️ The Solution: Data is persistent in MongoDB, not in memory.
+**The Risk:**  
+Simultaneous votes may overwrite each other in standard read-modify-write operations  
 
-⚠️ Known Limitations & Future Improvements
-While the current system is robust for the assignment's scope, the requirement for anonymity (no login) introduces specific trade-offs:
+**Solution:**  
+- Used MongoDB atomic operators:
+  - `$inc` (increment votes)  
+  - `$push` (store IPs)  
+- Ensures **100% data consistency under high load**  
 
-➡️ Shared Network (NAT) Restriction:
+---
 
-Limitation: Users on the same public WiFi (e.g., offices, dorms) share a single public IP. If one user votes, others on the same network may be blocked.
+### ➜ Network Normalization (Localhost Trap)
 
-Future Improvement: Implement Browser Fingerprinting (using canvas/audio context) to identify devices uniquely, or add an optional "Login via Google" for users on shared networks.
+**The Risk:**  
+Users can vote via IPv4 (`127.0.0.1`) and IPv6 (`::1`) separately  
 
-➡️ Socket Event Rate Limiting:
+**Solution:**  
+- Normalize both to a single identity before validation  
 
-Limitation: Our current rateLimiter middleware protects HTTP Routes (POST /createPoll). However, it does not protect our Socket Events. A hacker could write a script to connect to our socket and emit the vote event 1,000 times per second. Even though our DB logic will reject the votes (because of the IP check), our Database still gets hit with 1,000 queries to check that IP, potentially slowing it down.
+---
 
-Future Improvement: Implement a Token Bucket algorithm specifically for the socket.on('vote') event handler using Redis to ban abusive socket IDs.
+### ➜ Basic Double Voting
 
-➡️ VPN Spoofing:
+**The Risk:**  
+User clicks vote multiple times rapidly  
 
-Limitation: A user can vote, turn on a VPN (changing their IP), vote again, switch VPN servers, and vote again. It is very hard to stop without requiring a verified phone number or Login.
+**Solution:**  
+- Frontend disables button instantly (Optimistic UI)  
+- Backend validates IP before DB write  
 
-Future Improvement: Integrate a third-party IP Reputation API to detect and block traffic from known VPN/Proxy exits.
+---
+
+### ➜ Incognito Mode / Cache Clearing
+
+**The Risk:**  
+User clears localStorage to bypass client lock  
+
+**Solution:**  
+- Server-side IP verification prevents duplicate voting  
+
+---
+
+### ➜ Server Crashes
+
+**The Risk:**  
+Votes lost if stored in memory  
+
+**Solution:**  
+- Persistent storage using MongoDB  
+
+---
+
+## ⚠️ Known Limitations & Future Improvements
+
+While the system is robust, anonymous usage introduces trade-offs:
+
+---
+
+### ➜ Shared Network (NAT) Restriction
+
+**Limitation:**  
+Users on the same WiFi share one IP → only one vote allowed  
+
+**Future Improvement:**  
+- Browser Fingerprinting (Canvas / Audio context)  
+- Optional "Login with Google" for identity differentiation  
+
+---
+
+### ➜ Socket Event Rate Limiting
+
+**Limitation:**  
+HTTP routes are protected, but socket events are not  
+- Malicious users can spam vote events  
+- DB still gets hit even if votes are rejected  
+
+**Future Improvement:**  
+- Implement Token Bucket algorithm  
+- Use Redis to rate-limit `socket.on('vote')` events  
+- Ban abusive socket IDs  
+
+---
+
+### ➜ VPN Spoofing
+
+**Limitation:**  
+Users can change IP using VPN and vote multiple times  
+
+**Future Improvement:**  
+- Integrate IP reputation APIs  
+- Detect and block VPN / proxy traffic  
+- Optional verified login system  
+
+---
